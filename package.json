@@ -1,0 +1,25 @@
+{
+  "name": "getemployed",
+  "version": "1.0.0",
+  "description": "A professional job discovery and career intelligence platform designed for graduates and early-career professionals. This application provides real-time access to live job listings, simplified filtering, and personalized shortlisting capabilities.",
+  "homepage": "https://github.com/kshitizsurana/GetEmployed#readme",
+  "bugs": {
+    "url": "https://github.com/kshitizsurana/GetEmployed/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kshitizsurana/GetEmployed.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^7.0.1"
+  }
+}

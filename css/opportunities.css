@@ -81,11 +81,6 @@
   z-index: 0;
 }
 
-[data-theme="light"] .top10-number {
-  -webkit-text-stroke: 2px rgba(0,0,0,0.08);
-  color: #ffffff;
-  text-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
 
 .top10-item .job-card {
   min-width: 240px;
