@@ -60,7 +60,7 @@ async function fetchJobs(what = 'graduate', page = 1, sort = 'relevance', salary
   const url = new URL(ADZUNA_BASE + page);
   url.searchParams.set('app_id',           ADZUNA_APP_ID);
   url.searchParams.set('app_key',          ADZUNA_APP_KEY);
-  url.searchParams.set('results_per_page', '20');
+  url.searchParams.set('results_per_page', '12');
   url.searchParams.set('what',             what);
   url.searchParams.set('content-type',     'application/json');
   url.searchParams.set('sort_by',          toAdzunaSort(sort));

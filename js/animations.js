@@ -104,23 +104,61 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Job Cards Stagger
-  const jobSections = document.querySelectorAll('.opportunities-section, .top-picks');
-  jobSections.forEach(section => {
-    const cards = section.querySelectorAll('.job-card');
-    if (cards.length > 0) {
-      gsap.from(cards, {
-        scrollTrigger: {
-          trigger: section,
-          start: 'top 80%',
-        },
-        y: 60,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: 'back.out(1.2)'
+  // Dynamic Scroll Animations for Job Cards
+  const observeAndAnimate = (containerId, itemSelector, animProps) => {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    // Animate already existing skeletons initially
+    const skeletons = container.querySelectorAll('.skeleton-card');
+    if (skeletons.length > 0) {
+      gsap.from(skeletons, {
+        scrollTrigger: { trigger: container, start: 'top 85%' },
+        ...animProps, opacity: 0
       });
     }
+
+    const observer = new MutationObserver((mutations) => {
+      let addedItems = [];
+      mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(node => {
+          if (node.nodeType === 1 && node.matches(itemSelector)) {
+            addedItems.push(node);
+          } else if (node.nodeType === 1 && node.querySelector) {
+            const children = node.querySelectorAll(itemSelector);
+            if (children.length) addedItems.push(...children);
+          }
+        });
+      });
+      
+      if (addedItems.length > 0) {
+        gsap.from(addedItems, {
+          scrollTrigger: { trigger: container, start: 'top 85%' },
+          ...animProps,
+          opacity: 0
+        });
+      }
+    });
+    observer.observe(container, { childList: true, subtree: true });
+  };
+
+  // Trending Opportunities (Super premium 3D entrance)
+  observeAndAnimate('top-picks-list', '.top10-item', {
+    x: 80,
+    scale: 0.85,
+    rotationY: -15,
+    transformPerspective: 1000,
+    duration: 1,
+    stagger: 0.12,
+    ease: 'elastic.out(1, 0.7)'
+  });
+
+  // Global Opportunities Grid (Smooth vertical reveal)
+  observeAndAnimate('cards-grid', '.job-card', {
+    y: 60,
+    duration: 0.8,
+    stagger: 0.08,
+    ease: 'back.out(1.2)'
   });
 
   // About Info Cards Stagger

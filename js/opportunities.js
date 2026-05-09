@@ -209,7 +209,7 @@ function buildCard(job) {
 }
 function renderSkeletons() {
   if (!cardsGrid) return;
-  cardsGrid.innerHTML = Array(9).fill(`
+  cardsGrid.innerHTML = Array(12).fill(`
     <div class="skeleton-card" aria-hidden="true">
       <div class="skeleton-line long"></div>
       <div class="skeleton-line medium"></div>
@@ -376,9 +376,9 @@ async function fetchBrowse(page = 1) {
     );
     const trendingIds = new Set(state.trendingJobs.map(j => j.id));
     state.browseJobs = (data.results || [])
-      .map((raw, idx) => mapJob(raw, idx + (page - 1) * 20))
+      .map((raw, idx) => mapJob(raw, idx + (page - 1) * 12))
       .filter(job => !trendingIds.has(job.id));
-    state.totalPages = Math.min(Math.ceil((data.count || 0) / 20), 50);
+    state.totalPages = Math.min(Math.ceil((data.count || 0) / 12), 50);
     state.loading    = false;
     renderBrowseResults();
   } catch (err) {

@@ -3,7 +3,7 @@
   width: 100%;
   height: clamp(380px, 55vw, 620px);
   overflow: hidden;
-  background: #000;
+  background: transparent;
   display: flex;
   align-items: center;
   margin-top: -6rem;
@@ -126,8 +126,7 @@
 .site-footer {
   padding-top: 8rem;
   padding-bottom: 4rem;
-  background: #000;
-  border-top: 2px solid var(--accent);
+  background: transparent;
   position: relative;
   overflow: hidden;
 }
