@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 :root {
-  --bg:              #0a0a0a;
+  --bg:              rgba(5, 5, 5, 0.65);
   --surface:         #141414;
   --surface-raised:  #1a1a1a;
   --text:            #FFFFFF;
@@ -594,26 +594,26 @@ img {
   height: 95vh;
   min-height: 600px;
   overflow: hidden;
-  background: #000;
+  background: transparent;
   display: flex;
   align-items: flex-end;
 }
-.hero-media {
-  position: absolute;
+.site-bg-media {
+  position: fixed;
   inset: 0;
-  z-index: 1;
+  z-index: -2;
 }
-.hero-media img,
-.hero-media video {
+.site-bg-media img,
+.site-bg-media video {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center 25%;
 }
-.hero-overlay {
-  position: absolute;
+.site-bg-overlay {
+  position: fixed;
   inset: 0;
-  z-index: 2;
+  z-index: -1;
   background:
     linear-gradient(to right, rgba(10,10,10,0.85) 0%, rgba(10,10,10,0.45) 40%, transparent 100%),
     linear-gradient(to top, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.3) 35%, transparent 65%),
@@ -628,8 +628,8 @@ img {
   pointer-events: none;
   z-index: 1;
 }
-.hero-fade-top    { top: 0;    background: linear-gradient(to bottom, var(--bg), transparent); }
-.hero-fade-bottom { bottom: 0; background: linear-gradient(to top, var(--bg), transparent); }
+.hero-fade-top    { top: 0;    background: linear-gradient(to bottom, rgba(10,10,10,0.8), transparent); }
+.hero-fade-bottom { bottom: 0; background: linear-gradient(to top, rgba(10,10,10,0.9), transparent); }
 .hero-content {
   position: relative;
   z-index: 10;
