@@ -57,9 +57,46 @@
     document.getElementById('opportunities')
       ?.scrollIntoView({ behavior: 'smooth' });
   });
-  heroGhostCTA?.addEventListener('click', () => {
-    document.getElementById('about')
-      ?.scrollIntoView({ behavior: 'smooth' });
+  // ---- About Modal ----
+  const aboutModal    = document.getElementById('about-modal');
+  const aboutBackdrop = document.getElementById('about-backdrop');
+
+  function openAbout() {
+    aboutModal?.classList.add('active');
+    aboutBackdrop?.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeAbout() {
+    aboutModal?.classList.remove('active');
+    aboutBackdrop?.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  // Hero "About Us" button
+  heroGhostCTA?.addEventListener('click', openAbout);
+
+  // Navbar ABOUT button
+  document.getElementById('nav-about-btn')?.addEventListener('click', openAbout);
+
+  // Close on backdrop click
+  aboutBackdrop?.addEventListener('click', closeAbout);
+
+  // Close button inside modal
+  document.getElementById('about-modal-close')?.addEventListener('click', closeAbout);
+
+  // "Explore Roles" button inside modal scrolls to jobs & closes
+  document.getElementById('about-explore-btn')?.addEventListener('click', () => {
+    closeAbout();
+    setTimeout(() => {
+      document.getElementById('opportunities')
+        ?.scrollIntoView({ behavior: 'smooth' });
+    }, 300);
+  });
+
+  // Esc key closes
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeAbout();
   });
   if (searchToggleBtn && searchContainer) {
     searchToggleBtn.addEventListener('click', e => {

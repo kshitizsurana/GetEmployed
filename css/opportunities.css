@@ -180,13 +180,32 @@
 .skeleton-card {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-  padding: 1.25rem;
-  background: var(--surface);
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.04);
+  gap: 0.75rem;
+  padding: 1.4rem;
+  background: rgba(16, 16, 16, 0.6);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
   overflow: hidden;
-  min-height: 160px;
+  min-height: 200px;
+}
+
+/* Avatar placeholder */
+.skeleton-card::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.05) 0%,
+    rgba(255,255,255,0.1) 50%,
+    rgba(255,255,255,0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  flex-shrink: 0;
 }
 
 .skeleton-line {
@@ -194,7 +213,7 @@
   background: linear-gradient(
     90deg,
     rgba(255,255,255,0.04) 0%,
-    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.09) 50%,
     rgba(255,255,255,0.04) 100%
   );
   background-size: 200% 100%;

@@ -42,7 +42,27 @@ document.addEventListener('DOMContentLoaded', () => {
     opacity: 0,
     duration: 0.8,
     stagger: 0.1,
-    ease: 'power3.out'
+    ease: 'power3.out',
+    onComplete: () => {
+      // Counter Animation
+      const counters = document.querySelectorAll('.stat-number');
+      counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const suffix = counter.getAttribute('data-suffix') || '';
+        
+        gsap.to(counter, {
+          innerText: target,
+          duration: 2,
+          snap: { innerText: 1 },
+          ease: 'power1.out',
+          onUpdate: function() {
+            // Format number with commas for the 12,400 one
+            const value = Math.floor(this.targets()[0].innerText);
+            counter.innerText = value.toLocaleString() + suffix;
+          }
+        });
+      });
+    }
   }, 0.8);
 
 

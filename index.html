@@ -41,6 +41,7 @@
             <li><a href="#"              class="nav-link active" id="nav-home">DISCOVER</a></li>
             <li><a href="#opportunities" class="nav-link"        id="nav-browse">EXPLORE</a></li>
             <li><a href="#saved"         class="nav-link"        id="nav-saved">SAVED</a></li>
+            <li><button class="nav-link" id="nav-about-btn" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:inherit;">ABOUT</button></li>
           </ul>
         </div>
         <div class="navbar-right">
@@ -98,15 +99,15 @@
       </div>
       <div class="hero-stats" aria-label="Platform statistics">
         <div>
-          <strong>12,400+</strong>
+          <strong class="stat-number" data-target="12400" data-suffix="+">0</strong>
           <span>Live roles</span>
         </div>
         <div>
-          <strong>95%</strong>
+          <strong class="stat-number" data-target="95" data-suffix="%">0</strong>
           <span>Match accuracy</span>
         </div>
         <div>
-          <strong>180+</strong>
+          <strong class="stat-number" data-target="180" data-suffix="+">0</strong>
           <span>Companies</span>
         </div>
       </div>
@@ -263,11 +264,65 @@
       </div>
     </div>
   </footer>
-  <div class="modal-overlay" id="job-panel" role="dialog" aria-modal="true" aria-label="Job details">
-    <div class="jp-backdrop" id="jp-backdrop"></div>
-    <div class="modal-card" id="jp-drawer">
-      <button class="modal-close" id="jp-close" aria-label="Close job details">&#10005;</button>
-      <div id="jp-body"></div>
+  <div class="jp-backdrop" id="jp-backdrop"></div>
+  <aside class="jp-drawer" id="job-panel" role="dialog" aria-modal="true" aria-label="Job details">
+    <div class="jp-drawer-inner" id="jp-body"></div>
+  </aside>
+
+  <!-- About Modal -->
+  <div class="about-modal-backdrop" id="about-backdrop"></div>
+  <div class="about-modal" id="about-modal" role="dialog" aria-modal="true" aria-label="About GetEmployed">
+    <div class="about-modal-inner">
+      <button class="about-modal-close" id="about-modal-close" aria-label="Close">&times;</button>
+
+      <div class="about-modal-header">
+        <div class="about-modal-badge">ABOUT US</div>
+        <h2 class="about-modal-title">Intelligent careers for <em>ambitious graduates</em></h2>
+        <p class="about-modal-lead">We combine real-time opportunity discovery with sophisticated matching to connect you with the roles that actually matter — from anywhere on the planet.</p>
+      </div>
+
+      <div class="about-stats-row">
+        <div class="about-stat-cell">
+          <span class="about-stat-num">20,000+</span>
+          <span class="about-stat-label">Live Opportunities</span>
+        </div>
+        <div class="about-stat-cell">
+          <span class="about-stat-num">95%</span>
+          <span class="about-stat-label">Match Accuracy</span>
+        </div>
+        <div class="about-stat-cell">
+          <span class="about-stat-num">180+</span>
+          <span class="about-stat-label">Partner Companies</span>
+        </div>
+      </div>
+
+      <div class="about-features-grid">
+        <div class="about-feature-card">
+          <div class="about-feature-icon">&#9670;</div>
+          <h3>Real-Time Discovery</h3>
+          <p>Live roles fetched directly from the Adzuna API — updated hourly so you're always seeing the freshest opportunities, never stale listings.</p>
+        </div>
+        <div class="about-feature-card">
+          <div class="about-feature-icon">&#9670;</div>
+          <h3>Smart Match Signals</h3>
+          <p>Eight sophisticated signals evaluate each role against your profile — salary, location, category, and more — giving you a personalised match score.</p>
+        </div>
+        <div class="about-feature-card">
+          <div class="about-feature-icon">&#9670;</div>
+          <h3>Graduate-First Design</h3>
+          <p>Built exclusively for ambitious graduates and interns. Every filter, every card, every interaction is designed around the early-career journey.</p>
+        </div>
+        <div class="about-feature-card">
+          <div class="about-feature-icon">&#9670;</div>
+          <h3>Zero Friction</h3>
+          <p>No account. No sign-up. No bloat. Just open the platform and start discovering roles that align with your ambitions in seconds.</p>
+        </div>
+      </div>
+
+      <div class="about-modal-footer">
+        <p class="about-built-with">Powered by <strong>Adzuna API</strong> &middot; Built with <strong>HTML / CSS / JS</strong></p>
+        <button class="about-explore-btn" id="about-explore-btn">Explore Roles &rarr;</button>
+      </div>
     </div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>

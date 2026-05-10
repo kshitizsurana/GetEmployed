@@ -164,6 +164,13 @@ function buildCard(job) {
   const hue     = jobHue(job.id);
   const initial = (job.company || 'G').charAt(0).toUpperCase();
   const loc     = shortLocation(job.location);
+
+  // Generate a rich gradient per company using its hue
+  const avatarGrad = `linear-gradient(135deg, hsl(${hue},72%,38%) 0%, hsl(${(hue+40)%360},60%,25%) 100%)`;
+
+  // Category icon removed — text only
+  const catIcon = '';
+
   const card = document.createElement('article');
   card.className  = 'job-card';
   card.dataset.id = job.id;
@@ -396,68 +403,78 @@ function openPanel(id) {
   const job = [...state.browseJobs, ...state.trendingJobs, ...state.savedJobs]
     .find(j => j.id === sid);
   if (!job || !jpBody) return;
+
   const saved   = isSaved(job.id);
   const salary  = formatSalary(job);
   const loc     = shortLocation(job.location);
-  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-  const bgL     = isLight ? '96%' : '10%';
-  const gradL   = isLight ? '92%' : '14%';
-  const accentRed = '358, 92%';
+  const hue     = jobHue(job.id);
+
   jpBody.innerHTML = `
-    <div class="modal-hero" style="background: hsl(${accentRed}, ${bgL});">
-      <div style="
-        position:absolute; inset:0; z-index:1;
-        display:flex; align-items:center; justify-content:center;
-        background: linear-gradient(135deg, hsla(${accentRed}, ${gradL}, 1), hsla(${accentRed}, ${bgL}, 1));
-      ">
+    <div class="jp-header">
+      <button class="jp-close" id="jp-close" aria-label="Close">&times;</button>
+      <h2 class="jp-role">${escapeHtml(job.role)}</h2>
+      <p class="jp-company-line">${escapeHtml(job.company)}</p>
+      <div class="jp-chips">
+        <span class="jp-chip">${escapeHtml(loc)}</span>
+        <span class="jp-chip">${escapeHtml(job.category)}</span>
+        ${salary ? `<span class="jp-chip accent">${escapeHtml(salary)}</span>` : ''}
       </div>
-      <div class="modal-hero-overlay" style="z-index:2;">
-        <h2 style="
-          font-family: var(--font-heading);
-          font-style:italic;
-          font-size: clamp(1.4rem, 3vw, 2.2rem);
-          color: var(--text);
-          margin-bottom:1rem;
-          line-height:1.1;
-          font-weight: 800;
-        ">${escapeHtml(job.role)}</h2>
-        <div class="hero-buttons">
-          <a class="btn-primary"
-             href="${escapeHtml(job.redirectUrl)}"
-             target="_blank"
-             rel="noopener noreferrer">Apply Now ↗</a>
-          <button class="btn-secondary" id="jp-save-modal">
-            ${saved ? '✓ Shortlisted' : '+ Shortlist'}
-          </button>
+      <div class="jp-cta-row">
+        <a class="jp-btn-apply"
+           href="${escapeHtml(job.redirectUrl)}"
+           target="_blank"
+           rel="noopener noreferrer">Apply Now &rarr;</a>
+        <button class="jp-btn-save${saved ? ' saved' : ''}" id="jp-save-modal">
+          ${saved ? '✓ Shortlisted' : '+ Shortlist'}
+        </button>
+      </div>
+    </div>
+
+    <div class="jp-body-section">
+      <p class="jp-section-label">About the Role</p>
+      <p class="jp-description">${escapeHtml(job.description)}</p>
+    </div>
+
+    <div class="jp-body-section">
+      <p class="jp-section-label">Role Details</p>
+      <div class="jp-details-grid">
+        <div class="jp-detail-cell">
+          <span class="jp-detail-label">Company</span>
+          <span class="jp-detail-value">${escapeHtml(job.company)}</span>
+        </div>
+        <div class="jp-detail-cell">
+          <span class="jp-detail-label">Location</span>
+          <span class="jp-detail-value">${escapeHtml(loc)}</span>
+        </div>
+        <div class="jp-detail-cell">
+          <span class="jp-detail-label">Category</span>
+          <span class="jp-detail-value">${escapeHtml(job.category)}</span>
+        </div>
+        <div class="jp-detail-cell">
+          <span class="jp-detail-label">Salary</span>
+          <span class="jp-detail-value salary-value">${salary || 'On Request'}</span>
         </div>
       </div>
     </div>
-    <div class="modal-body">
-      <div class="modal-left">
-        <p style="color:var(--muted); line-height:1.75; font-size:0.92rem;">
-          ${escapeHtml(job.description)}
-        </p>
-      </div>
-      <div class="modal-right">
-        <div class="modal-cast" style="gap:0.75rem;">
-          <div><span>Company</span>${escapeHtml(job.company)}</div>
-          <div><span>Location</span>${escapeHtml(loc)}</div>
-          <div><span>Category</span>${escapeHtml(job.category)}</div>
-          <div><span>Salary</span>${salary || 'Disclosed on request'}</div>
-        </div>
-      </div>
-    </div>
+
+    <div class="jp-footer-pad"></div>
   `;
+
+  // Wire up close button inside the panel
+  document.getElementById('jp-close')?.addEventListener('click', closePanel);
+
   document.getElementById('jp-save-modal')?.addEventListener('click', () => {
     toggleSave(job);
     openPanel(id);
   });
+
   jobPanel?.classList.add('active');
+  document.getElementById('jp-backdrop')?.classList.add('active');
   document.body.style.overflow = 'hidden';
-  jpClose?.focus();
 }
 function closePanel() {
   jobPanel?.classList.remove('active');
+  document.getElementById('jp-backdrop')?.classList.remove('active');
   document.querySelectorAll('.job-card.active').forEach(c => c.classList.remove('active'));
   document.body.style.overflow = '';
 }
@@ -488,8 +505,9 @@ document.addEventListener('categorychange', e => {
   state.page     = 1;
   fetchBrowse(1);
 });
-jpClose?.addEventListener('click', closePanel);
-jpBackdrop?.addEventListener('click', closePanel);
+// The close button inside the panel is wired in openPanel()
+// Backdrop click closes the drawer
+document.getElementById('jp-backdrop')?.addEventListener('click', closePanel);
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closePanel();
 });
