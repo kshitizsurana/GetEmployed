@@ -39,7 +39,9 @@
   --border-strong:   rgba(229,9,20,0.3);
 }
 html {
-  font-size: 80%;
+  font-size: 90%;
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--nav-height);
   transition:
     background-color 0.35s ease,
     color 0.35s ease;
@@ -62,10 +64,7 @@ html {
               border-color 200ms ease, box-shadow 200ms ease, fill 200ms ease;
 }
 
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: var(--nav-height);
-}
+/* Combined with top block */
 body {
   background: var(--bg);
   color: var(--text);
@@ -75,7 +74,7 @@ body {
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
-  zoom: 0.8;
+  zoom: 0.9;
 }
 body::before {
   content: '';
@@ -598,7 +597,7 @@ img {
 .hero {
   position: relative;
   width: 100%;
-  height: 95vh;
+  height: 100vh;
   min-height: 600px;
   overflow: hidden;
   background: transparent;
@@ -636,12 +635,13 @@ img {
   z-index: 1;
 }
 .hero-fade-top    { top: 0;    background: linear-gradient(to bottom, rgba(10,10,10,0.8), transparent); }
-.hero-fade-bottom { bottom: 0; background: linear-gradient(to top, rgba(10,10,10,0.9), transparent); }
+/* Fixed background overlay already handles the bottom fade better, removing redundant absolute fade */
+.hero-fade-bottom { display: none; }
 .hero-content {
   position: relative;
   z-index: 10;
   width: 100%;
-  padding: 0 var(--container-pad) clamp(4rem, 9vw, 7rem);
+  padding: 0 var(--container-pad) 3rem;
   max-width: calc(720px + var(--container-pad) * 2);
 }
 .hero-title {
