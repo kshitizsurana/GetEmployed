@@ -46,7 +46,7 @@ function toAdzunaSort(sort) {
     default:            return 'relevance';
   }
 }
-async function fetchJobs(what = 'graduate', page = 1, sort = 'relevance', salaryMin = 0, resultsPerPage = 12) {
+export async function fetchJobs(what = 'graduate', page = 1, sort = 'relevance', salaryMin = 0, resultsPerPage = 12) {
   what      = String(what || 'graduate').trim().substring(0, 100) || 'graduate';
   page      = Math.max(1, Math.min(parseInt(page) || 1, 50));
   sort      = ['relevance', 'salary-desc', 'date-desc', 'az'].includes(sort) ? sort : 'relevance';

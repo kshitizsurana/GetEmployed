@@ -1,3 +1,5 @@
+import { fetchJobs } from './adzuna.js';
+
 'use strict';
 const SAVED_KEY = 'getemployed_saved_v2';
 function loadSavedJobs() {
