@@ -39,6 +39,7 @@
   --border-strong:   rgba(229,9,20,0.3);
 }
 html {
+  font-size: 80%;
   transition:
     background-color 0.35s ease,
     color 0.35s ease;
@@ -74,6 +75,7 @@ body {
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  zoom: 0.8;
 }
 body::before {
   content: '';
