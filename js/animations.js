@@ -182,9 +182,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // About Info Cards Stagger
-  gsap.from('.about-info-card', {
+  gsap.from('.about-feature-card', {
     scrollTrigger: {
-      trigger: '.about-grid',
+      trigger: '.about-features-grid',
       start: 'top 80%',
     },
     y: 50,

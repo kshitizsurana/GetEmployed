@@ -7,8 +7,8 @@ const MAX_RETRIES    = 2;
 const RETRY_DELAY    = 1000;
 const CACHE_DURATION = 5 * 60 * 1000;
 const requestCache   = {};
-function getCacheKey(what, page, sort, salaryMin) {
-  return `${what}_${page}_${sort}_${salaryMin}`;
+function getCacheKey(what, page, sort, salaryMin, resultsPerPage) {
+  return `${what}_${page}_${sort}_${salaryMin}_${resultsPerPage}`;
 }
 function isCacheValid(key) {
   const cached = requestCache[key];
@@ -46,12 +46,12 @@ function toAdzunaSort(sort) {
     default:            return 'relevance';
   }
 }
-async function fetchJobs(what = 'graduate', page = 1, sort = 'relevance', salaryMin = 0) {
+async function fetchJobs(what = 'graduate', page = 1, sort = 'relevance', salaryMin = 0, resultsPerPage = 12) {
   what      = String(what || 'graduate').trim().substring(0, 100) || 'graduate';
   page      = Math.max(1, Math.min(parseInt(page) || 1, 50));
   sort      = ['relevance', 'salary-desc', 'date-desc', 'az'].includes(sort) ? sort : 'relevance';
   salaryMin = parseInt(salaryMin) || 0;
-  const cacheKey = getCacheKey(what, page, sort, salaryMin);
+  const cacheKey = getCacheKey(what, page, sort, salaryMin, resultsPerPage);
   const cached   = getFromCache(cacheKey);
   if (cached) {
     console.log('[Cache Hit]', cacheKey);
@@ -60,7 +60,7 @@ async function fetchJobs(what = 'graduate', page = 1, sort = 'relevance', salary
   const url = new URL(ADZUNA_BASE + page);
   url.searchParams.set('app_id',           ADZUNA_APP_ID);
   url.searchParams.set('app_key',          ADZUNA_APP_KEY);
-  url.searchParams.set('results_per_page', '12');
+  url.searchParams.set('results_per_page', String(resultsPerPage));
   url.searchParams.set('what',             what);
   url.searchParams.set('content-type',     'application/json');
   url.searchParams.set('sort_by',          toAdzunaSort(sort));
