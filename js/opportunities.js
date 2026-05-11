@@ -1,4 +1,5 @@
 import { fetchJobs } from './adzuna.js';
+import { Auth, showToast } from './auth.js';
 
 'use strict';
 const SAVED_KEY = 'getemployed_saved_v2';
@@ -58,8 +59,9 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 function isSaved(id) {
-  return state.savedJobs.some(j => j.id === String(id));
+  return Auth.isSaved(id);
 }
+
 function normalizeCategory(label) {
   const l = (label || '').toLowerCase();
   if (['it','tech','software','engineer','data','developer','cloud','cyber'].some(k => l.includes(k))) return 'tech';
@@ -103,15 +105,10 @@ function formatSalary(job) {
   return null;
 }
 function toggleSave(job) {
-  const idx = state.savedJobs.findIndex(j => j.id === job.id);
-  if (idx === -1) {
-    state.savedJobs.push(job);
-  } else {
-    state.savedJobs.splice(idx, 1);
-  }
-  localStorage.setItem(SAVED_KEY, JSON.stringify(state.savedJobs));
+  Auth.toggleSaved(job);
   refreshAllUI();
 }
+
 function jobHue(id) {
   const hues = [230, 260, 290, 320, 170, 200, 30, 0];
   const sum  = [...String(id)].reduce((s, c) => s + c.charCodeAt(0), 0);
@@ -152,8 +149,9 @@ function pipeline(jobs, ...transforms) {
   return transforms.reduce((currentJobs, transform) => transform(currentJobs), jobs);
 }
 function getFilteredBrowseJobs() {
-  // We trust the API results for browse jobs as we pass filters to the API call.
-  // We only apply sorting locally to ensure immediate feedback.
+  if (state.category === 'foryou' && Auth.user) {
+    return [...state.browseJobs].sort((a, b) => Auth.matchScore(b) - Auth.matchScore(a));
+  }
   return pipeline(
     state.browseJobs,
     sortJobs(state.sort)
@@ -162,15 +160,7 @@ function getFilteredBrowseJobs() {
 function buildCard(job) {
   const saved   = isSaved(job.id);
   const salary  = formatSalary(job);
-  const hue     = jobHue(job.id);
-  const initial = (job.company || 'G').charAt(0).toUpperCase();
   const loc     = shortLocation(job.location);
-
-  // Generate a rich gradient per company using its hue
-  const avatarGrad = `linear-gradient(135deg, hsl(${hue},72%,38%) 0%, hsl(${(hue+40)%360},60%,25%) 100%)`;
-
-  // Category icon removed — text only
-  const catIcon = '';
 
   const card = document.createElement('article');
   card.className  = 'job-card';
@@ -196,8 +186,18 @@ function buildCard(job) {
         <span class="card-loc-text">${escapeHtml(loc)}</span>
         ${salary ? `<span class="card-salary-text">${escapeHtml(salary)}</span>` : ''}
       </div>
+      ${Auth.user ? (() => {
+        const sc  = Auth.matchScore(job);
+        const cls = sc >= 80 ? 'high' : sc >= 55 ? 'mid' : 'low';
+        const applied = Auth.isApplied(job.id);
+        return `<div class="card-badge-row">
+          <span class="ge-match-badge ge-match--${cls}">${sc}% match</span>
+          ${applied ? '<span class="ge-applied-badge">Applied ✓</span>' : ''}
+        </div>`;
+      })() : ''}
     </div>
   `;
+
   card.querySelector('.az-save-btn').addEventListener('click', e => {
     e.stopPropagation();
     toggleSave(job);
@@ -237,13 +237,23 @@ function renderBrowseResults() {
       : '';
   }
   if (jobs.length === 0) {
+    const isForYou = state.category === 'foryou';
     cardsGrid.innerHTML = `
-      <div class="empty-state">
-        <p style="margin-bottom:1rem;">No roles found for the selected filters.</p>
-        <button class="btn-secondary" id="clear-filters-btn">Clear Filters</button>
+      <div class="empty-state" style="grid-column: 1/-1; padding: 4rem 2rem; text-align: center; background: rgba(255,255,255,0.02); border-radius: 24px; border: 1px dashed rgba(255,255,255,0.1);">
+        <div style="font-size: 3rem; margin-bottom: 1.5rem; opacity: 0.5;">${isForYou ? '🎯' : '🔍'}</div>
+        <h3 style="font-family: var(--font-display); font-size: 2rem; margin-bottom: 1rem; color: #fff;">${isForYou ? 'Refine Your Search' : 'No Results Found'}</h3>
+        <p style="margin-bottom: 2rem; color: var(--muted); max-width: 400px; margin-inline: auto;">${isForYou
+          ? 'We couldn\'t find direct matches for your current interests. Try broadening your preferences for better results.'
+          : 'We couldn\'t find any roles matching those specific filters. Try adjusting your search criteria.'
+        }</p>
+        ${isForYou
+          ? `<button class="btn-primary" id="update-prefs-btn" style="font-size:0.85rem;">Update Preferences</button>`
+          : `<button class="btn-secondary" id="clear-filters-btn">Clear Filters</button>`
+        }
       </div>
     `;
     document.getElementById('clear-filters-btn')?.addEventListener('click', resetFilters);
+    document.getElementById('update-prefs-btn')?.addEventListener('click', () => Auth.openPrefsModal());
     renderPagination(0);
     return;
   }
@@ -280,16 +290,25 @@ function renderTrending() {
 function renderSavedSection() {
   if (!savedSectionGrid) return;
   savedSectionGrid.innerHTML = '';
-  if (state.savedJobs.length === 0) {
-    savedSectionGrid.innerHTML = `
-      <div class="saved-empty" id="saved-empty">
-        No roles shortlisted yet. Browse opportunities and hit <strong>+</strong> to save them here.
-      </div>
-    `;
+  const saved = Auth.savedJobs;
+  if (saved.length === 0) {
+    if (Auth.user) {
+      savedSectionGrid.innerHTML = `
+        <div class="saved-empty" id="saved-empty">
+          No roles shortlisted yet. Browse below and hit <strong>+</strong> to save roles here.
+        </div>`;
+    } else {
+      savedSectionGrid.innerHTML = `
+        <div class="saved-empty" id="saved-empty" style="display:flex;flex-direction:column;align-items:center;gap:1rem;">
+          <p>Sign up free to save roles and get personalised matches.</p>
+          <button class="btn-primary" id="saved-signup-cta" style="font-size:0.85rem;padding:0.55rem 1.4rem;">Create Free Account</button>
+        </div>`;
+      document.getElementById('saved-signup-cta')?.addEventListener('click', () => Auth.openModal('signup'));
+    }
     return;
   }
   const fragment = document.createDocumentFragment();
-  state.savedJobs.forEach(job => fragment.appendChild(buildCard(job)));
+  saved.forEach(job => fragment.appendChild(buildCard(job)));
   savedSectionGrid.appendChild(fragment);
 }
 function renderPagination(visibleCount) {
@@ -375,12 +394,29 @@ async function fetchBrowse(page = 1) {
   state.error   = null;
   renderSkeletons();
   if (resultsCount) resultsCount.textContent = 'Loading…';
+
+  let searchWhat = state.query;
+  let searchSalary = state.salary;
+
+  if (!searchWhat) {
+    if (state.category === 'foryou' && Auth.user && Auth.prefs) {
+      const cats = (Auth.prefs.categories || []);
+      searchWhat = cats.length ? cats.join(' ') : 'graduate internship';
+      if (!state.salary && Auth.prefs.salaryMin) searchSalary = Auth.prefs.salaryMin;
+      if (resultsCount) resultsCount.textContent = 'Loading your personalised feed…';
+    } else if (state.category && state.category !== 'all') {
+      searchWhat = state.category;
+    } else {
+      searchWhat = 'graduate internship';
+    }
+  }
+
   try {
     const data = await fetchJobs(
-      state.query || (state.category && state.category !== 'all' ? state.category : 'graduate internship'),
+      searchWhat,
       state.page,
       state.sort,
-      state.salary,
+      searchSalary,
       12
     );
     state.browseJobs = (data.results || [])
@@ -392,13 +428,10 @@ async function fetchBrowse(page = 1) {
     state.loading = false;
     state.error   = err.message;
     console.warn('[fetchBrowse] API unavailable — using fallback data:', err.message);
-    
-    // Support multiple pages in fallback mode
     const start = (page - 1) * 12;
     const end   = start + 12;
     state.browseJobs = FALLBACK_JOBS.slice(start, end).map((raw, idx) => mapJob(raw, raw.id));
     state.totalPages = Math.ceil(FALLBACK_JOBS.length / 12);
-    
     if (resultsCount) resultsCount.textContent = 'Demo Mode: Showing curated opportunities';
     renderBrowseResults();
   }
@@ -412,7 +445,6 @@ function openPanel(id) {
   const saved   = isSaved(job.id);
   const salary  = formatSalary(job);
   const loc     = shortLocation(job.location);
-  const hue     = jobHue(job.id);
 
   jpBody.innerHTML = `
     <div class="jp-header">
@@ -428,7 +460,7 @@ function openPanel(id) {
         <a class="jp-btn-apply"
            href="${escapeHtml(job.redirectUrl)}"
            target="_blank"
-           rel="noopener noreferrer">Apply Now &rarr;</a>
+           rel="noopener noreferrer">Apply Now</a>
         <button class="jp-btn-save${saved ? ' saved' : ''}" id="jp-save-modal">
           ${saved ? '✓ Shortlisted' : '+ Shortlist'}
         </button>
@@ -465,12 +497,17 @@ function openPanel(id) {
     <div class="jp-footer-pad"></div>
   `;
 
-  // Wire up close button inside the panel
   document.getElementById('jp-close')?.addEventListener('click', closePanel);
 
   document.getElementById('jp-save-modal')?.addEventListener('click', () => {
     toggleSave(job);
     openPanel(id);
+  });
+
+  document.querySelector('.jp-btn-apply')?.addEventListener('click', () => {
+    Auth.markApplied(job.id);
+    showToast('Application tracked! Good luck', 'success');
+    setTimeout(() => { renderBrowseResults(); updatePersonalisedHero(); }, 400);
   });
 
   jobPanel?.classList.add('active');
@@ -512,8 +549,6 @@ document.addEventListener('categorychange', e => {
   state.page     = 1;
   fetchBrowse(1);
 });
-// The close button inside the panel is wired in openPanel()
-// Backdrop click closes the drawer
 document.getElementById('jp-backdrop')?.addEventListener('click', closePanel);
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closePanel();
@@ -522,6 +557,7 @@ document.getElementById('billboard-cta')?.addEventListener('click', () => {
   document.getElementById('opportunities')?.scrollIntoView({ behavior: 'smooth' });
 });
 (function init() {
+  updatePersonalisedHero();
   renderSavedSection();
   fetchTrending()
     .then(() => fetchBrowse(1))
@@ -531,4 +567,97 @@ document.getElementById('billboard-cta')?.addEventListener('click', () => {
       state.totalPages = 1;
       renderBrowseResults();
     });
+
+  window.addEventListener('ge:authchange', () => {
+    updatePersonalisedHero();
+    if (Auth.user && Auth.prefs?.onboarded) {
+      const forYouTab = document.querySelector('.tab[data-cat="foryou"]');
+      if (forYouTab && !forYouTab.classList.contains('active')) {
+        forYouTab.click();
+      }
+    }
+    refreshAllUI();
+  });
+  window.addEventListener('ge:prefschange', () => { fetchBrowse(1); });
+  window.addEventListener('ge:savedchange', () => { renderSavedSection(); renderBrowseResults(); });
+  document.addEventListener('ge:resetfilters', () => resetFilters());
 })();
+
+function updatePersonalisedHero() {
+  const user  = Auth.user;
+  const prefs = Auth.prefs;
+  const heading = document.getElementById('hero-heading');
+  const desc    = document.querySelector('.hero-desc');
+  const stats   = document.querySelectorAll('.hero-stats .stat-number');
+
+  if (user) {
+    const firstName = user.name.split(' ')[0];
+    if (heading) heading.innerHTML = `Welcome back, <em>${escapeHtml(firstName)}</em>`;
+    if (desc) {
+      const cats  = (prefs?.categories || []).join(', ') || 'all areas';
+      const loc   = prefs?.location && prefs.location !== 'Anywhere' ? ` in ${prefs.location}` : '';
+      desc.textContent = `Personalised ${cats} roles${loc} — updated live.`;
+    }
+    if (stats.length >= 3) {
+      const saved   = Auth.savedJobs.length;
+      const applied = Auth.appliedJobs.length;
+      const cats    = (prefs?.categories || []).length;
+      stats[0].textContent = saved   || '0';
+      stats[1].textContent = applied || '0';
+      stats[2].textContent = cats    || '—';
+      const labels = document.querySelectorAll('.hero-stats span');
+      if (labels[0]) labels[0].textContent = 'Saved roles';
+      if (labels[1]) labels[1].textContent = 'Applied';
+      if (labels[2]) labels[2].textContent = 'Interests';
+    }
+    const ctaPrimary = document.getElementById('hero-cta');
+    const ctaGhost   = document.getElementById('hero-cta-ghost');
+    
+    if (ctaPrimary) {
+      if (prefs?.onboarded) {
+        ctaPrimary.innerHTML = `View Matches`;
+        const nextSec = () => document.getElementById('opportunities')?.scrollIntoView({ behavior: 'smooth' });
+        const newPrimary = ctaPrimary.cloneNode(true);
+        ctaPrimary.parentNode.replaceChild(newPrimary, ctaPrimary);
+        newPrimary.addEventListener('click', nextSec);
+      } else {
+        ctaPrimary.innerHTML = `Personalise Feed`;
+        const newPrimary = ctaPrimary.cloneNode(true);
+        ctaPrimary.parentNode.replaceChild(newPrimary, ctaPrimary);
+        newPrimary.addEventListener('click', () => Auth.openOnboarding());
+      }
+    }
+    if (ctaGhost) {
+      ctaGhost.innerHTML = `Preferences`;
+      const newGhost = ctaGhost.cloneNode(true);
+      ctaGhost.parentNode.replaceChild(newGhost, ctaGhost);
+      newGhost.addEventListener('click', () => Auth.openPrefsModal());
+    }
+  } else {
+    if (heading) heading.innerHTML = `Launch Your <em>Legacy</em>`;
+    if (desc) desc.textContent = `Real-time graduate jobs and internships. Smart matching that puts you ahead — no account needed.`;
+    const defaults = [{ v:'12,400+', l:'Live roles' }, { v:'95%', l:'Match accuracy' }, { v:'180+', l:'Companies' }];
+    const labels = document.querySelectorAll('.hero-stats span');
+    stats.forEach((el, i) => { if (defaults[i]) el.textContent = defaults[i].v; });
+    labels.forEach((el, i) => { if (defaults[i]) el.textContent = defaults[i].l; });
+
+    const ctaPrimary = document.getElementById('hero-cta');
+    const ctaGhost   = document.getElementById('hero-cta-ghost');
+    if (ctaPrimary) {
+      ctaPrimary.innerHTML = `Explore Roles`;
+    }
+    if (ctaGhost) {
+      ctaGhost.innerHTML = `Our Vision`;
+      const newGhost = ctaGhost.cloneNode(true);
+      ctaGhost.parentNode.replaceChild(newGhost, ctaGhost);
+      newGhost.addEventListener('click', () => {
+        const aboutModal = document.getElementById('about-modal');
+        const aboutBackdrop = document.getElementById('about-backdrop');
+        aboutModal?.classList.add('active');
+        aboutBackdrop?.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+    }
+  }
+}
+

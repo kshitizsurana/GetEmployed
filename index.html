@@ -12,19 +12,37 @@
   <meta name="twitter:card"       content="summary_large_image" />
   <meta name="twitter:image"      content="https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=1200" />
   <title>GetEmployed | Career Intelligence for the Next Generation</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💼</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./css/style.css" />
   <link rel="stylesheet" href="./css/util.css" />
   <link rel="stylesheet" href="./css/opportunities.css" />
   <link rel="stylesheet" href="./css/sections.css" />
+  <link rel="stylesheet" href="./css/auth.css" />
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "GetEmployed",
+    "url": "https://get-employed-gold.vercel.app/",
+    "description": "Discover top graduate jobs and internships in real time. Smart matching for students and graduates.",
+    "applicationCategory": "Career",
+    "operatingSystem": "All",
+    "author": {
+      "@type": "Person",
+      "name": "Kshitiz Surana"
+    }
+  }
+  </script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script type="module" src="/js/adzuna.js"></script>
-  <script type="module" src="/js/main.js"></script>
-  <script type="module" src="/js/opportunities.js"></script>
-  <script type="module" src="/js/animations.js"></script>
+  <script type="module" src="./js/auth.js"></script>
+  <script type="module" src="./js/adzuna.js"></script>
+  <script type="module" src="./js/main.js"></script>
+  <script type="module" src="./js/opportunities.js"></script>
+  <script type="module" src="./js/animations.js"></script>
 </head>
 <body data-theme="dark">
 
@@ -51,12 +69,7 @@
         <div class="navbar-right">
           <div class="search-container" id="search-container">
             <button class="nav-icon" id="search-toggle-btn" aria-label="Toggle search" aria-expanded="false">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                   fill="none" stroke="currentColor" stroke-width="2.2"
-                   stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </button>
             <div class="search-bar-wrap" role="search">
               <form style="margin:0;width:100%;" onsubmit="return false;">
@@ -87,17 +100,9 @@
       </p>
       <div class="hero-buttons">
         <button class="btn-primary" id="hero-cta">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
-            <path d="M5 3l14 9-14 9V3z"/>
-          </svg>
           Explore Roles
         </button>
         <button class="btn-secondary" id="hero-cta-ghost">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
-               stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M12 16v-4"/><path d="M12 8h.01"/>
-          </svg>
           About Us
         </button>
       </div>
@@ -124,7 +129,7 @@
         <p class="section-subtext">The highest-engagement roles curated from our live index.</p>
       </header>
       <div class="scroll-container-wrap">
-        <button class="scroll-arrow scroll-arrow--left" aria-label="Scroll left">&#10094;</button>
+        <button class="scroll-arrow scroll-arrow--left" aria-label="Scroll left">&lt;</button>
         <ul class="scroll-container top10-container" id="top-picks-list" role="list">
           <li class="skeleton-card" aria-hidden="true" style="min-width:280px;">
             <div class="skeleton-line long"></div>
@@ -152,7 +157,7 @@
             <div class="skeleton-line short"></div>
           </li>
         </ul>
-        <button class="scroll-arrow scroll-arrow--right" aria-label="Scroll right">&#10095;</button>
+        <button class="scroll-arrow scroll-arrow--right" aria-label="Scroll right">&gt;</button>
       </div>
     </section>
     <section class="content-row container section" id="saved" aria-label="Your shortlisted roles">
@@ -184,6 +189,7 @@
     <section class="content-row container section" id="opportunities" aria-label="Global opportunity index">
       <div class="category-tabs-wrap" style="margin-bottom: 2rem; border-bottom: none;">
         <div class="category-tabs" id="category-tabs" role="tablist" aria-label="Filter by job category">
+          <button class="tab"        data-cat="foryou"     role="tab" aria-selected="false">For You</button>
           <button class="tab active" data-cat="all"        role="tab" aria-selected="true">All Roles</button>
           <button class="tab"        data-cat="tech"       role="tab" aria-selected="false">Technology</button>
           <button class="tab"        data-cat="healthcare" role="tab" aria-selected="false">Life Sciences</button>
@@ -273,7 +279,6 @@
     <div class="jp-drawer-inner" id="jp-body"></div>
   </aside>
 
-  <!-- About Modal -->
   <div class="about-modal-backdrop" id="about-backdrop"></div>
   <div class="about-modal" id="about-modal" role="dialog" aria-modal="true" aria-label="About GetEmployed">
     <div class="about-modal-inner">
@@ -302,22 +307,18 @@
 
       <div class="about-features-grid">
         <div class="about-feature-card">
-          <div class="about-feature-icon">&#9670;</div>
           <h3>Real-Time Discovery</h3>
           <p>Live roles fetched directly from the Adzuna API — updated hourly so you're always seeing the freshest opportunities, never stale listings.</p>
         </div>
         <div class="about-feature-card">
-          <div class="about-feature-icon">&#9670;</div>
           <h3>Smart Match Signals</h3>
           <p>Eight sophisticated signals evaluate each role against your profile — salary, location, category, and more — giving you a personalised match score.</p>
         </div>
         <div class="about-feature-card">
-          <div class="about-feature-icon">&#9670;</div>
           <h3>Graduate-First Design</h3>
           <p>Built exclusively for ambitious graduates and interns. Every filter, every card, every interaction is designed around the early-career journey.</p>
         </div>
         <div class="about-feature-card">
-          <div class="about-feature-icon">&#9670;</div>
           <h3>Zero Friction</h3>
           <p>No account. No sign-up. No bloat. Just open the platform and start discovering roles that align with your ambitions in seconds.</p>
         </div>
@@ -325,7 +326,7 @@
 
       <div class="about-modal-footer">
         <p class="about-built-with">Powered by <strong>Adzuna API</strong> &middot; Built with <strong>HTML / CSS / JS</strong></p>
-        <button class="about-explore-btn" id="about-explore-btn">Explore Roles &rarr;</button>
+        <button class="about-explore-btn" id="about-explore-btn">Explore Roles</button>
       </div>
     </div>
   </div>

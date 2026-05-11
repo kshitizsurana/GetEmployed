@@ -62,8 +62,10 @@ export async function fetchJobs(what = 'graduate', page = 1, sort = 'relevance',
   url.searchParams.set('app_key',          ADZUNA_APP_KEY);
   url.searchParams.set('results_per_page', String(resultsPerPage));
   url.searchParams.set('what',             what);
-  url.searchParams.set('content-type',     'application/json');
-  url.searchParams.set('sort_by',          toAdzunaSort(sort));
+  const adzunaSort = toAdzunaSort(sort);
+  if (adzunaSort !== 'relevance') {
+    url.searchParams.set('sort_by', adzunaSort);
+  }
   if (salaryMin > 0) {
     url.searchParams.set('salary_min', String(salaryMin));
   }

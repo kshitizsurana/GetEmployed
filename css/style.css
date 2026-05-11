@@ -64,7 +64,6 @@ html {
               border-color 200ms ease, box-shadow 200ms ease, fill 200ms ease;
 }
 
-/* Combined with top block */
 body {
   background: var(--bg);
   color: var(--text);
@@ -250,12 +249,18 @@ img {
   width: 100%;
   z-index: 1000;
   height: var(--nav-height);
-  background: transparent;
-  transition: background 0.4s ease;
+  background: rgba(10, 10, 10, 0.01);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  transition: background 0.5s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.5s ease;
+  border-bottom: 1px solid transparent;
 }
 
 .navbar.scrolled {
-  background: transparent;
+  background: rgba(10, 10, 10, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 .navbar::before {
   content: '';
@@ -639,7 +644,7 @@ img {
   z-index: 1;
 }
 .hero-fade-top    { top: 0;    background: linear-gradient(to bottom, rgba(10,10,10,0.8), transparent); }
-/* Fixed background overlay already handles the bottom fade better, removing redundant absolute fade */
+
 .hero-fade-bottom { display: none; }
 .hero-content {
   position: relative;
@@ -722,7 +727,12 @@ img {
   min-height: 44px;
   letter-spacing: -0.01em;
 }
-.btn-primary:hover  { box-shadow: 0 4px 20px rgba(255,255,255,0.2); }
+.btn-primary:hover  {
+  background: #f0f0f0;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.15), 0 0 40px rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+}
+.btn-primary:active { transform: translateY(0); }
 .btn-secondary {
   display: inline-flex;
   align-items: center;
@@ -744,7 +754,12 @@ img {
   min-height: 44px;
   letter-spacing: -0.01em;
 }
-.btn-secondary:hover  { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.3); }
+.btn-secondary:hover  {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+.btn-secondary:active { transform: translateY(0); }
 .btn-ghost {
   display: inline-flex;
   align-items: center;
@@ -846,9 +861,7 @@ select.btn-secondary option {
 .grid-3 { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
 @media (min-width: 640px)  { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 1024px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } }
-/* ============================================================
-   JOB CARD — 21st.dev Premium Component
-   ============================================================ */
+
 .job-card {
   position: relative;
   cursor: pointer;
@@ -856,36 +869,41 @@ select.btn-secondary option {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: rgba(16, 16, 16, 0.6);
+  background: rgba(10, 10, 10, 0.4);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   transition:
-    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.35s ease;
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.4s ease;
   will-change: transform;
 }
 
-/* Animated gradient border glow on hover */
+.job-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
 .job-card::before {
   content: '';
   position: absolute;
-  inset: -1px;
-  border-radius: 17px;
-  background: linear-gradient(
-    135deg,
-    transparent 0%,
-    rgba(229, 9, 20, 0.0) 40%,
-    rgba(229, 9, 20, 0.5) 100%
+  inset: 0;
+  background: radial-gradient(
+    600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 255, 255, 0.06),
+    transparent 40%
   );
   opacity: 0;
-  transition: opacity 0.4s ease;
-  z-index: 0;
+  transition: opacity 0.5s ease;
+  z-index: 1;
   pointer-events: none;
 }
 
-/* Shimmer sweep on hover */
+.job-card:hover::before {
+  opacity: 1;
+}
+
 .job-card::after {
   content: '';
   position: absolute;
@@ -915,13 +933,11 @@ select.btn-secondary option {
 .job-card:hover::before { opacity: 1; }
 .job-card:hover::after  { background-position: 200% 0; }
 
-/* Active state */
 .job-card.active {
   border-color: rgba(229, 9, 20, 0.6);
   box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.2);
 }
 
-/* --- Inner Padding Shell --- */
 .card-inner-pad {
   position: relative;
   z-index: 2;
@@ -932,7 +948,6 @@ select.btn-secondary option {
   height: 100%;
 }
 
-/* --- Company Avatar (generated initials) --- */
 .card-company-avatar {
   width: 40px;
   height: 40px;
@@ -949,7 +964,6 @@ select.btn-secondary option {
   margin-bottom: 1rem;
 }
 
-/* --- Header Row (role title + save btn) --- */
 .card-header-top {
   display: flex;
   justify-content: space-between;
@@ -975,7 +989,6 @@ select.btn-secondary option {
 
 .job-card:hover .card-role-display { color: #ffffff; }
 
-/* --- Meta Row (category tag + company name) --- */
 .card-meta-row {
   display: flex;
   flex-direction: column;
@@ -1001,7 +1014,6 @@ select.btn-secondary option {
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* --- Footer Row (location + salary) --- */
 .card-footer-row {
   margin-top: auto;
   display: flex;
@@ -1031,7 +1043,6 @@ select.btn-secondary option {
   white-space: nowrap;
 }
 
-/* --- Save / Bookmark Button --- */
 .az-save-btn {
   width: 34px;
   height: 34px;
@@ -1199,11 +1210,7 @@ select.btn-secondary option {
   align-items: center;
   height: 40px;
 }
-/* ============================================================
-   JOB DETAIL DRAWER — 21st.dev Premium Panel
-   ============================================================ */
 
-/* Backdrop */
 .jp-backdrop {
   position: fixed;
   inset: 0;
@@ -1223,7 +1230,6 @@ select.btn-secondary option {
   cursor: pointer;
 }
 
-/* Drawer Panel */
 .jp-drawer {
   position: fixed;
   top: 0;
@@ -1246,7 +1252,6 @@ select.btn-secondary option {
   transform: translateX(0);
 }
 
-/* Inner scroll container */
 .jp-drawer-inner {
   flex: 1;
   overflow-y: auto;
@@ -1258,7 +1263,6 @@ select.btn-secondary option {
 .jp-drawer-inner::-webkit-scrollbar { width: 4px; }
 .jp-drawer-inner::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
 
-/* ---- Header Band ---- */
 .jp-header {
   position: relative;
   padding: 2.5rem 2rem 2rem;
@@ -1292,7 +1296,6 @@ select.btn-secondary option {
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Company Avatar Large */
 .jp-avatar {
   width: 56px;
   height: 56px;
@@ -1326,7 +1329,6 @@ select.btn-secondary option {
   margin-bottom: 1.5rem;
 }
 
-/* Metadata chips row */
 .jp-chips {
   display: flex;
   flex-wrap: wrap;
@@ -1355,7 +1357,6 @@ select.btn-secondary option {
   color: #ff6b6b;
 }
 
-/* CTA Buttons */
 .jp-cta-row {
   display: flex;
   gap: 0.75rem;
@@ -1418,7 +1419,6 @@ select.btn-secondary option {
   color: #ff6b6b;
 }
 
-/* ---- Body Section ---- */
 .jp-body-section {
   padding: 1.75rem 2rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -1440,7 +1440,6 @@ select.btn-secondary option {
   font-weight: 300;
 }
 
-/* ---- Details Grid ---- */
 .jp-details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1479,7 +1478,6 @@ select.btn-secondary option {
   font-size: 0.95rem;
 }
 
-/* ---- Bottom padding ---- */
 .jp-footer-pad {
   height: 3rem;
 }
@@ -1723,10 +1721,6 @@ select.btn-secondary option {
   text-align: center;
 }
 
-/* ============================================================
-   ABOUT MODAL — Premium Centered Card
-   ============================================================ */
-
 .about-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -1776,7 +1770,6 @@ select.btn-secondary option {
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,0.1) transparent;
-  /* subtle top glow */
   box-shadow:
     0 0 0 1px rgba(255,255,255,0.05),
     0 40px 120px rgba(0, 0, 0, 0.8),
@@ -1791,7 +1784,6 @@ select.btn-secondary option {
   opacity: 1;
 }
 
-/* Close button */
 .about-modal-close {
   position: absolute;
   top: 1.25rem;
@@ -1817,7 +1809,6 @@ select.btn-secondary option {
   color: #fff;
 }
 
-/* ---- Header ---- */
 .about-modal-header {
   padding: 3rem 2.5rem 2rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -1866,7 +1857,6 @@ select.btn-secondary option {
   max-width: 56ch;
 }
 
-/* ---- Stats Row ---- */
 .about-stats-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1902,7 +1892,6 @@ select.btn-secondary option {
   color: rgba(255, 255, 255, 0.35);
 }
 
-/* ---- Features Grid ---- */
 .about-features-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1944,7 +1933,6 @@ select.btn-secondary option {
   font-weight: 300;
 }
 
-/* ---- Footer ---- */
 .about-modal-footer {
   padding: 1.5rem 2.5rem;
   display: flex;

@@ -1,15 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Register ScrollTrigger
   gsap.registerPlugin(ScrollTrigger);
 
-
-
-
-
-  // --- Hero Animations ---
   const heroTl = gsap.timeline();
   
-  // Animate Navbar
   heroTl.from('.navbar', {
     y: -100,
     opacity: 0,
@@ -17,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     ease: 'power3.out'
   }, 0.2);
 
-  // Animate Hero Content
   heroTl.from('.hero-title', {
     y: 50,
     opacity: 0,
@@ -44,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
     stagger: 0.1,
     ease: 'power3.out',
     onComplete: () => {
-      // Counter Animation
       const counters = document.querySelectorAll('.stat-number');
       counters.forEach(counter => {
         const target = parseInt(counter.getAttribute('data-target'));
@@ -56,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
           snap: { innerText: 1 },
           ease: 'power1.out',
           onUpdate: function() {
-            // Format number with commas for the 12,400 one
             const value = Math.floor(this.targets()[0].innerText);
             counter.innerText = value.toLocaleString() + suffix;
           }
@@ -65,9 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 0.8);
 
-
-
-  // --- Magnetic Buttons ---
   const magneticButtons = document.querySelectorAll('.btn-primary, .btn-secondary');
   magneticButtons.forEach(btn => {
     btn.addEventListener('mousemove', (e) => {
@@ -93,8 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // --- Scroll Animations for Sections ---
-  // Section Headers
   gsap.utils.toArray('.section-heading').forEach(heading => {
     gsap.from(heading, {
       scrollTrigger: {
@@ -124,12 +109,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Dynamic Scroll Animations for Job Cards
   const observeAndAnimate = (containerId, itemSelector, animProps) => {
     const container = document.getElementById(containerId);
     if (!container) return;
     
-    // Animate already existing skeletons initially
     const skeletons = container.querySelectorAll('.skeleton-card');
     if (skeletons.length > 0) {
       gsap.from(skeletons, {
@@ -162,7 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
     observer.observe(container, { childList: true, subtree: true });
   };
 
-  // Trending Opportunities (Super premium 3D entrance)
   observeAndAnimate('top-picks-list', '.top10-item', {
     x: 80,
     scale: 0.85,
@@ -173,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
     ease: 'elastic.out(1, 0.7)'
   });
 
-  // Global Opportunities Grid (Smooth vertical reveal)
   observeAndAnimate('cards-grid', '.job-card', {
     y: 60,
     duration: 0.8,
@@ -181,7 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
     ease: 'back.out(1.2)'
   });
 
-  // About Info Cards Stagger
   gsap.from('.about-feature-card', {
     scrollTrigger: {
       trigger: '.about-features-grid',
@@ -194,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
     ease: 'power3.out'
   });
 
-  // Footer Parallax & Reveal
   gsap.from('.site-footer .container > *', {
     scrollTrigger: {
       trigger: '.site-footer',
@@ -207,27 +186,27 @@ document.addEventListener('DOMContentLoaded', () => {
     ease: 'power3.out'
   });
   
-
-
-  // --- 3D Tilt Effect for Job Cards ---
   const cards3D = document.querySelectorAll('.job-card');
   cards3D.forEach(card => {
     card.addEventListener('mousemove', (e) => {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
+      
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+      
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
-      
-      const rotateX = ((y - centerY) / centerY) * -10; // Max rotation 10deg
-      const rotateY = ((x - centerX) / centerX) * 10;
+      const rotateX = ((y - centerY) / centerY) * -6; 
+      const rotateY = ((x - centerX) / centerX) * 6;
       
       gsap.to(card, {
         rotateX: rotateX,
         rotateY: rotateY,
         transformPerspective: 1000,
-        transformOrigin: 'center center',
-        duration: 0.4,
+        scale: 1.02,
+        duration: 0.5,
         ease: 'power2.out'
       });
     });
@@ -236,7 +215,8 @@ document.addEventListener('DOMContentLoaded', () => {
       gsap.to(card, {
         rotateX: 0,
         rotateY: 0,
-        duration: 0.7,
+        scale: 1,
+        duration: 0.8,
         ease: 'elastic.out(1, 0.3)'
       });
     });

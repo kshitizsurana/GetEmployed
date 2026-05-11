@@ -40,6 +40,11 @@
         currentId = id;
       }
     }
+    document.getElementById('nav-logo')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.dispatchEvent(new CustomEvent('ge:resetfilters'));
+    });
     const navMap = {
       hero: 'nav-home',
       'row-top-picks': 'nav-browse',
@@ -57,7 +62,6 @@
     document.getElementById('opportunities')
       ?.scrollIntoView({ behavior: 'smooth' });
   });
-  // ---- About Modal ----
   const aboutModal    = document.getElementById('about-modal');
   const aboutBackdrop = document.getElementById('about-backdrop');
 
@@ -73,19 +77,10 @@
     document.body.style.overflow = '';
   }
 
-  // Hero "About Us" button
   heroGhostCTA?.addEventListener('click', openAbout);
-
-  // Navbar ABOUT button
   document.getElementById('nav-about-btn')?.addEventListener('click', openAbout);
-
-  // Close on backdrop click
   aboutBackdrop?.addEventListener('click', closeAbout);
-
-  // Close button inside modal
   document.getElementById('about-modal-close')?.addEventListener('click', closeAbout);
-
-  // "Explore Roles" button inside modal scrolls to jobs & closes
   document.getElementById('about-explore-btn')?.addEventListener('click', () => {
     closeAbout();
     setTimeout(() => {
@@ -93,8 +88,6 @@
         ?.scrollIntoView({ behavior: 'smooth' });
     }, 300);
   });
-
-  // Esc key closes
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeAbout();
   });
@@ -111,6 +104,7 @@
       if (!searchContainer.contains(e.target)) {
         searchContainer.classList.remove('active');
         searchToggleBtn.setAttribute('aria-expanded', 'false');
+        if (searchInput) searchInput.value = '';
       }
     });
     searchInput?.addEventListener('keydown', e => {

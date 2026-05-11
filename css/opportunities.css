@@ -50,13 +50,11 @@
 .scroll-arrow--left  { left: 0; }
 .scroll-arrow--right { right: 0; }
 
-
 .top10-container {
   gap: 16px;
   padding: 0.5rem 0.5rem 1rem;
   align-items: flex-end;
 }
-
 
 .top10-item {
   display: flex;
@@ -65,7 +63,6 @@
   flex-shrink: 0;
   list-style: none;
 }
-
 
 .top10-number {
   font-size: 160px;
@@ -80,7 +77,6 @@
   flex-shrink: 0;
   z-index: 0;
 }
-
 
 .top10-item .job-card {
   min-width: 240px;
@@ -190,7 +186,6 @@
   min-height: 200px;
 }
 
-/* Avatar placeholder */
 .skeleton-card::before {
   content: '';
   display: block;
@@ -249,8 +244,8 @@
 }
 
 .error-msg::before {
-  content: '⚠';
-  font-size: 1.75rem;
+  content: 'Warning';
+  font-size: 0.9rem;
   color: #f87171;
 }
 
